@@ -1,10 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
+﻿using GoogleAnalytics;
+using System;
 using System.Threading.Tasks;
-using GoogleAnalytics;
 
 namespace Test
 {
@@ -36,19 +32,22 @@ namespace Test
                 Title = "Test"
             };
 
-#if NETFRAMEWORK
-            analytics.UserProperties["dotnet"] = ".NET Framework";
-#else
-            analytics.UserProperties["dotnet"] = RuntimeInformation.FrameworkDescription;
-#endif
-
-            m.Params["debug_mode"] = "1";
-
             analytics.Events.Add(m);
 
-            await GoogleAnalytics.HttpProtocol.PostMeasurements(analytics);
-
-            Console.WriteLine("measurement sent!!");
+            var errors = await GoogleAnalytics.HttpProtocol.ValidateMeasurements(analytics);
+            if (errors.ValidationMessages?.Length > 0)
+            {
+                foreach (var error in errors.ValidationMessages)
+                {
+                    Console.WriteLine("{0}: {1}", error.ValidationCode, error.Description);
+                }
+            }
+            else
+            {
+                Console.WriteLine("measurement validated!!");
+                await GoogleAnalytics.HttpProtocol.PostMeasurements(analytics);
+                Console.WriteLine("measurement sent!!");
+            }
         }
     }
 }

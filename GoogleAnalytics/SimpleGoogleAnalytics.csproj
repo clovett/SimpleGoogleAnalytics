@@ -1,11 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyOriginatorKeyFile>$(MYKEYFILE)</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
-    <Version>1.1.2</Version>
+    <Version>1.1.3</Version>
     <Authors>Chris Lovett</Authors>
     <Company>LovettSoftware</Company>
     <Description>A simple wrapper on Google Analytics 4 protocol.</Description>
@@ -14,8 +15,8 @@
     <PackageTags>Google Analytics, GA4, C#</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/clovett/SimpleGoogleAnalytics</PackageProjectUrl>
-    <AssemblyVersion>1.1.2.0</AssemblyVersion>
-    <FileVersion>1.1.2.0</FileVersion>
+    <AssemblyVersion>1.1.3.0</AssemblyVersion>
+    <FileVersion>1.1.3.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

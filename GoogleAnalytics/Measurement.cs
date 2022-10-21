@@ -26,8 +26,15 @@ namespace GoogleAnalytics
         [IgnoreDataMember]
         public string MeasurementId { get; set; }
 
-        [DataMember(Name= "user_id")]
+        [DataMember(Name= "client_id")]
+        //[DataMember(Name = "user_id")]
         public string ClientId { get; set; }
+
+        [DataMember(Name = "user_id")]
+        public string UserId { get; set; }
+
+        [DataMember(Name = "user_properties")]
+        public UserProperties UserProperties { get; set; }
 
         [DataMember(Name = "events")]
         public List<Measurement> Events = new List<Measurement>();
@@ -37,9 +44,6 @@ namespace GoogleAnalytics
 
         [DataMember(Name = "non_personalized_ads")]
         public bool NonPersonalizedAds { get; set; }
-
-        [DataMember(Name = "user_properties")]
-        public Dictionary<string, string> UserProperties = new Dictionary<string, string>();
 
         public string ToQueryString()
         {
@@ -57,6 +61,32 @@ namespace GoogleAnalytics
             }
         }
 
+    }
+
+    [DataContract]
+    public class UserProperties
+    {
+        [DataMember(Name = "platform")]
+        public UserPropertyValue Platform { get; set; }
+        [DataMember(Name = "platform_version")]
+        public UserPropertyValue PlatformVersion { get; set; }
+        [DataMember(Name = "dotnet")]
+        public UserPropertyValue FrameworkVersion { get; set; }
+        [DataMember(Name = "language")]
+        public UserPropertyValue Language { get; set; }
+    }
+
+
+    [DataContract]
+    public class UserPropertyValue
+    {
+        public UserPropertyValue(string value)
+        {
+            Value = value;
+        }
+
+        [DataMember(Name = "value")]
+        public string Value { get; set; }
     }
 
     [DataContract]
@@ -220,4 +250,5 @@ namespace GoogleAnalytics
             set => SetParam("label", value);
         }
     }
+
 }
