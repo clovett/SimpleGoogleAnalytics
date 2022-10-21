@@ -4,6 +4,10 @@ using System.Runtime.Serialization;
 
 namespace GoogleAnalytics
 {
+    /// <summary>
+    /// This class wraps the GA4 protocol.
+    /// See https://developers.google.com/analytics/devguides/collection/protocol/ga4/reference
+    /// </summary>
     [KnownType(typeof(PageMeasurement))]
     [KnownType(typeof(EventMeasurement))]
     [KnownType(typeof(ExceptionMeasurement))]
@@ -16,11 +20,13 @@ namespace GoogleAnalytics
             this.TimeStamp = DateTimeOffset.Now.ToUnixTimeMilliseconds() * 1000;
         }
 
+        [IgnoreDataMember]
         public string ApiSecret { get; set; }
 
+        [IgnoreDataMember]
         public string MeasurementId { get; set; }
 
-        [DataMember(Name="client_id")]
+        [DataMember(Name= "user_id")]
         public string ClientId { get; set; }
 
         [DataMember(Name = "events")]
@@ -32,12 +38,14 @@ namespace GoogleAnalytics
         [DataMember(Name = "non_personalized_ads")]
         public bool NonPersonalizedAds { get; set; }
 
+        [DataMember(Name = "user_properties")]
+        public Dictionary<string, string> UserProperties = new Dictionary<string, string>();
+
         public string ToQueryString()
         {
             Required(MeasurementId, "MeasurementId");
             Required(ClientId, "ClientId");
             Required(ApiSecret, "ApiSecret");
-
             return string.Format("api_secret={0}&measurement_id={1}", ApiSecret, MeasurementId);
         }
 
@@ -66,9 +74,6 @@ namespace GoogleAnalytics
 
         [DataMember(Name = "params")]
         public Dictionary<string, string> Params = new Dictionary<string, string>();
-
-        //[DataMember(Name = "items")]
-        //public List<DataItem> Items = new List<DataItem>();
 
         protected void Required(string value, string name)
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
@@ -11,15 +12,16 @@ namespace Test
     {
         static async Task Main(string[] args)
         {
-            if (args.Length < 2)
+            if (args.Length < 3)
             {
-                Console.WriteLine("Usage Test <Google Analytics Measurement Id> <Api Secret>");
+                Console.WriteLine("Usage Test <Google Analytics Measurement Id> <Api Secret> <uri>");
                 return;
             }
 
             string clientId = Guid.NewGuid().ToString();
             string trackingId = args[0];
             string apiSecret = args[1];
+            string uri = args[2];
 
             var analytics = new Analytics()
             {
@@ -27,13 +29,20 @@ namespace Test
                 ApiSecret = apiSecret,
                 ClientId = clientId
             };
+
             var m = new PageMeasurement()
             {
-                Path = "https://microsoft.github.io/XmlNotepad/App/FormSearch",
-                Title = "FormOptions"
+                Path = uri,
+                Title = "Test"
             };
 
-            // m.Params["debug_mode"] = "1";
+#if NETFRAMEWORK
+            analytics.UserProperties["dotnet"] = ".NET Framework";
+#else
+            analytics.UserProperties["dotnet"] = RuntimeInformation.FrameworkDescription;
+#endif
+
+            m.Params["debug_mode"] = "1";
 
             analytics.Events.Add(m);
 
