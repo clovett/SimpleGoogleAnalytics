@@ -16,7 +16,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/clovett/SimpleGoogleAnalytics</PackageProjectUrl>
     <AssemblyVersion>1.1.5.0</AssemblyVersion>
-    <FileVersion>1.1.5</FileVersion>
+    <FileVersion>1.1.40</FileVersion>
   </PropertyGroup>
 
 </Project>
