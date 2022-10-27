@@ -24,7 +24,6 @@ namespace GoogleAnalytics
         public static async Task<ValidationResponse> ValidateMeasurements(Analytics a)
         {
             var response = await Post(DebugBaseUrl, a);
-            response.EnsureSuccessStatusCode();
             if (response.Content != null)
             {
                 using (var stream = await response.Content.ReadAsStreamAsync())
@@ -44,6 +43,11 @@ namespace GoogleAnalytics
             if (a.Events.Count > 25)
             {
                 throw new Exception("A maximum of 25 events can be specified per request." + guide);
+            }
+
+            if (System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
+            {
+                throw new Exception("A network intercace is not available");
             }
 
             string query = a.ToQueryString();
