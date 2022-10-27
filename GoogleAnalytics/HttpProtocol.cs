@@ -3,19 +3,41 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices;
 
 namespace GoogleAnalytics
 {
-    public class HttpProtocol
+    public static class HttpProtocol
     {
-        const string baseUrl = "https://www.google-analytics.com/mp/collect";
-        const string debugBaseUrl = "https://www.google-analytics.com/debug/mp/collect";
+        private const string BaseUrl = "https://www.google-analytics.com/mp/collect";
+        private const string DebugBaseUrl = "https://www.google-analytics.com/debug/mp/collect";
 
-        public static async Task PostMeasurements(Analytics a)
+        public static Task PostMeasurements(Analytics a)
+        {
+            return Post(BaseUrl, a);
+        }
+
+        public static async Task<ValidationResponse> ValidateMeasurements(Analytics a)
+        {
+            var response = await Post(DebugBaseUrl, a);
+            response.EnsureSuccessStatusCode();
+            if (response.Content != null)
+            {
+                using (var stream = await response.Content.ReadAsStreamAsync())
+                {
+                    var responseSerializer = new DataContractJsonSerializer(typeof(ValidationResponse));
+                    return (ValidationResponse)responseSerializer.ReadObject(stream);
+                }
+            }
+
+            throw new Exception("No validation response");
+        }
+
+        private static async Task<HttpResponseMessage> Post(string baseUri, Analytics a)
         {
             const string guide = "\r\nSee https://developers.google.com/analytics/devguides/collection/protocol/ga4";
 
@@ -25,7 +47,7 @@ namespace GoogleAnalytics
             }
 
             string query = a.ToQueryString();
-            string url = baseUrl + "?" + query;
+            string url = baseUri + "?" + query;
 
             if (string.IsNullOrEmpty(a.UserId))
             {
@@ -33,35 +55,31 @@ namespace GoogleAnalytics
             }
 
             HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", "GoogleAnalyticsDotNetClient");
+            AddUserProperties(client, a);
 
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(a);
-
-            var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+            DataContractJsonSerializerSettings settings = new DataContractJsonSerializerSettings();
+            settings.EmitTypeInformation = EmitTypeInformation.Never;
+            settings.UseSimpleDictionaryFormat = true;
+            settings.KnownTypes = GetKnownTypes(a);
+            var serializer = new DataContractJsonSerializer(typeof(Analytics), settings);
+            var ms = new MemoryStream();
+            serializer.WriteObject(ms, a);
+            var bytes = ms.GetBuffer();
             if (bytes.Length > 130000)
             {
                 throw new Exception("The total size of analytics payloads cannot be greater than 130kb bytes" + guide);
             }
 
+            var json = Encoding.UTF8.GetString(bytes);
+            json = new StreamReader("d:\\temp\\json2.json").ReadToEnd();
             var jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await client.PostAsync(url, jsonContent);
+            var response = await client.PostAsync(new Uri(url), jsonContent);
             response.EnsureSuccessStatusCode();
+            return response;
         }
 
-        public static async Task<ValidationResponse> ValidateMeasurements(Analytics a)
+        private static void AddUserProperties(HttpClient client, Analytics a)
         {
-            const string guide = "\r\nSee https://developers.google.com/analytics/devguides/collection/protocol/ga4";
-
-            if (a.Events.Count > 25)
-            {
-                throw new Exception("A maximum of 25 events can be specified per request." + guide);
-            }
-
-            string query = a.ToQueryString();
-            string url = debugBaseUrl + "?" + query;
-
-            HttpClient client = new HttpClient();
-
             string platform = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "Windows" :
                 (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "Linux" : "OSX");
             var arch = RuntimeInformation.OSArchitecture.ToString();
@@ -74,24 +92,16 @@ namespace GoogleAnalytics
                 PlatformVersion = new UserPropertyValue(RuntimeInformation.OSDescription),
                 Language = new UserPropertyValue(CultureInfo.CurrentCulture.Name)
             };
+        }
 
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(a);
-
-            var bytes = System.Text.Encoding.UTF8.GetBytes(json);
-            if (bytes.Length > 130000)
+        private static Type[] GetKnownTypes(Analytics a)
+        {
+            HashSet<Type> types = new HashSet<Type>();
+            foreach (var e in a.Events)
             {
-                throw new Exception("The total size of analytics payloads cannot be greater than 130kb bytes" + guide);
+                types.Add(e.GetType());
             }
-
-            var jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await client.PostAsync(url, jsonContent);
-            response.EnsureSuccessStatusCode();
-            if (response.Content != null)
-            {
-                var message = await response.Content.ReadAsStringAsync();
-                return Newtonsoft.Json.JsonConvert.DeserializeObject<ValidationResponse>(message);
-            }
-            throw new Exception("No validation response");
+            return new List<Type>(types).ToArray();
         }
     }
 
@@ -101,7 +111,6 @@ namespace GoogleAnalytics
         [DataMember(Name = "validationMessages")]
         public ValidationMessage[] ValidationMessages;
     }
-
 
     [DataContract]
     public class ValidationMessage

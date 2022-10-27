@@ -1,5 +1,6 @@
 ﻿using GoogleAnalytics;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Test
@@ -26,15 +27,18 @@ namespace Test
                 ClientId = clientId
             };
 
-            var m = new PageMeasurement()
+            var m = new TestEventMeasurement()
             {
-                Path = uri,
-                Title = "Test"
+                Action = "test",
+                Result = "passed",
+                Bugs = 10,
+                TestTime = 23
             };
 
             analytics.Events.Add(m);
 
-            var errors = await GoogleAnalytics.HttpProtocol.ValidateMeasurements(analytics);
+
+            var errors = await HttpProtocol.ValidateMeasurements(analytics);
             if (errors.ValidationMessages?.Length > 0)
             {
                 foreach (var error in errors.ValidationMessages)
@@ -45,7 +49,7 @@ namespace Test
             else
             {
                 Console.WriteLine("measurement validated!!");
-                await GoogleAnalytics.HttpProtocol.PostMeasurements(analytics);
+                await HttpProtocol.PostMeasurements(analytics);
                 Console.WriteLine("measurement sent!!");
             }
         }
