@@ -75,7 +75,6 @@ namespace GoogleAnalytics
             }
 
             var json = Encoding.UTF8.GetString(bytes);
-            json = new StreamReader("d:\\temp\\json2.json").ReadToEnd();
             var jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await client.PostAsync(new Uri(url), jsonContent);
             response.EnsureSuccessStatusCode();
