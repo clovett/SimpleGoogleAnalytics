@@ -47,7 +47,7 @@ namespace GoogleAnalytics
 
             if (!System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
             {
-                throw new Exception("A network intercace is not available");
+                throw new Exception("A network interface is not available");
             }
 
             string query = a.ToQueryString();
