@@ -137,6 +137,22 @@ namespace GoogleAnalytics
     }
 
     /// <summary>
+    /// A wrapper for the "session_start" measurement.
+    /// </summary>
+    [DataContract]
+    public class SessionStartMeasurement : Measurement
+    {
+        //Todo RoS:
+        //It appears we somehow need add and handle ga_session_id and ga_session_number
+        //See https://support.google.com/analytics/answer/9234069#session_start
+        //"A session ID and session number are generated automatically with each session and associated with each event in the session."
+        public SessionStartMeasurement()
+        {
+            this.Name = "session_start";
+        }
+    }
+
+    /// <summary>
     /// A wrapper for the "page_view" measurement.
     /// </summary>
     [DataContract]
