@@ -6,17 +6,17 @@
     <AssemblyOriginatorKeyFile>$(MYKEYFILE)</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
-    <Version>1.1.6</Version>
-    <Authors>Chris Lovett</Authors>
-    <Company>LovettSoftware</Company>
-    <Description>A simple wrapper on Google Analytics 4 protocol.</Description>
-    <Copyright>Lovett Software</Copyright>
-    <RepositoryUrl>https://github.com/clovett/SimpleGoogleAnalytics</RepositoryUrl>
+    <Version>2.0.0</Version>
+    <Authors>Chris Lovett, Robert Schaub</Authors>
+    <Company>LovettSoftware, Sonova AG</Company>
+    <Description>A simple wrapper on the Google Analytics 4 Measurement protocol.</Description>
+    <Copyright>Lovett Software, Sonova AG</Copyright>
+    <RepositoryUrl>https://github.com/11RS/SimpleGoogleAnalytics</RepositoryUrl>
     <PackageTags>Google Analytics, GA4, C#</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/clovett/SimpleGoogleAnalytics</PackageProjectUrl>
-    <AssemblyVersion>1.1.6.0</AssemblyVersion>
-    <FileVersion>1.1.6</FileVersion>
+    <PackageProjectUrl>https://github.com/11RS/SimpleGoogleAnalytics</PackageProjectUrl>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0</FileVersion>
   </PropertyGroup>
 
 </Project>

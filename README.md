@@ -1,23 +1,22 @@
-This is very simple .NET standard library for sending Google analytics measurements to Google
-using the `Google Analytics 4` protocol.
+This is a very simple test application for sending Google analytics measurements to Google using the `Google Analytics 4` protocol.
+Forked from clovett/SimpleGoogleAnalytics
 
-Use it like this:
+The current Application emulates sessions with associated events.
 
-```c#
-var analytics = new Analytics()
-{
-    MeasurementId = trackingId,
-    ApiSecret = apiSecret,
-    ClientId = clientId
-};
-analytics.Events.Add(new PageMeasurement()
-{
-    Path = "https://microsoft.github.io/XmlNotepad/help/find/",
-    Title = "Find"
-});
-// you can add up to 25 events per Post.
-await GoogleAnalytics.HttpProtocol.PostMeasurements(analytics);
-```
+Important:
+=>Please adjust launchSettings.json for you own needs!
 
-Supports page views, events, timing, and exception measurements. The library is tiny, only 180 lines of code
-so feel free to fork it and have fun or submit a PR, thanks.
+Open issues:
+
+1. Sessions don't appear as expected at the GA4 analysis.
+I couldn't find helpful documentation on how to track sessions and associate events to sessions with the GA4 Measurement protocol.
+I undarstand that we somehow need to create session_start a ga_session_id and ga_session_number and then send these them with the events also.
+"A session ID and session number are generated automatically with each session and associated with each event in the session." (From https://support.google.com/analytics/answer/9234069#session_start)
+The current application is an attempt only, based on this information.
+
+2. How to send region (country..) information?
+
+See also Todo tags in the source code.
+
+
+

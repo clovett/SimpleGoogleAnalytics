@@ -8,6 +8,7 @@ namespace GoogleAnalytics
     /// This class wraps the GA4 protocol payload.
     /// See https://developers.google.com/analytics/devguides/collection/protocol/ga4/reference.
     /// </summary>
+    [KnownType(typeof(SessionStartMeasurement))]
     [KnownType(typeof(PageMeasurement))]
     [KnownType(typeof(EventMeasurement))]
     [KnownType(typeof(ExceptionMeasurement))]
@@ -105,6 +106,24 @@ namespace GoogleAnalytics
         [DataMember(Name = "params")]
         public Dictionary<string, object> Params = new Dictionary<string, object>();
 
+        //Todo RoS:
+        //It seems we somehow need to:
+        //-generate ga_session_id and ga_session_number
+        //-and pass with all events
+        //See https://support.google.com/analytics/answer/9234069#session_start
+        //"A session ID and session number are generated automatically with each session and associated with each event in the session."
+        public string SessionId
+        {
+            get => this.GetParam("ga_session_id");
+            set => this.SetParam("ga_session_id", value);
+        }
+
+        public string SessionNumber
+        {
+            get => this.GetParam("ga_session_number");
+            set => this.SetParam("ga_session_number", value);
+        }
+
         protected string GetParam(string name)
         {
             if (this.Params.TryGetValue(name, out object value) && value is string s)
@@ -133,6 +152,18 @@ namespace GoogleAnalytics
         protected void SetDoubleParam(string name, double value)
         {
             this.Params[name] = value;
+        }
+    }
+
+    /// <summary>
+    /// A wrapper for the "session_start" measurement.
+    /// </summary>
+    [DataContract]
+    public class SessionStartMeasurement : Measurement
+    {
+        public SessionStartMeasurement()
+        {
+            this.Name = "session_start";
         }
     }
 
@@ -296,18 +327,6 @@ namespace GoogleAnalytics
         {
             get => this.GetParam("value");
             set => this.SetParam("value", value);
-        }
-
-        public int Bugs
-        {
-            get => (int)this.GetDoubleParam("bugs");
-            set => this.SetDoubleParam("bugs", value);
-        }
-
-        public double TestTime
-        {
-            get => (int)this.GetDoubleParam("test_time");
-            set => this.SetDoubleParam("test_time", value);
         }
     }
 }

@@ -61,24 +61,33 @@ namespace GoogleAnalytics
             HttpClient client = new HttpClient();
             AddUserProperties(client, a);
 
-            DataContractJsonSerializerSettings settings = new DataContractJsonSerializerSettings();
-            settings.EmitTypeInformation = EmitTypeInformation.Never;
-            settings.UseSimpleDictionaryFormat = true;
-            settings.KnownTypes = GetKnownTypes(a);
-            var serializer = new DataContractJsonSerializer(typeof(Analytics), settings);
-            var ms = new MemoryStream();
-            serializer.WriteObject(ms, a);
-            var bytes = ms.GetBuffer();
-            if (bytes.Length > 130000)
+            var settings = new DataContractJsonSerializerSettings
             {
-                throw new Exception("The total size of analytics payloads cannot be greater than 130kb bytes" + guide);
+                EmitTypeInformation = EmitTypeInformation.Never,
+                UseSimpleDictionaryFormat = true,
+                KnownTypes = GetKnownTypes(a)
+            };
+            var serializer = new DataContractJsonSerializer(typeof(Analytics), settings);
+
+            byte[] bytes;
+            
+            using (var ms = new MemoryStream())
+            {
+                serializer.WriteObject(ms, a);
+                bytes = ms.ToArray();
+                if (bytes.Length > 130000)
+                {
+                    throw new Exception("The total size of analytics payloads cannot be greater than 130kb bytes" + guide);
+                }
             }
 
             var json = Encoding.UTF8.GetString(bytes);
-            var jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await client.PostAsync(new Uri(url), jsonContent);
-            response.EnsureSuccessStatusCode();
-            return response;
+            using (var jsonContent = new StringContent(json, Encoding.UTF8, "application/json"))
+            {
+                var response = await client.PostAsync(new Uri(url), jsonContent);
+                response.EnsureSuccessStatusCode();
+                return response;
+            }
         }
 
         private static void AddUserProperties(HttpClient client, Analytics a)
