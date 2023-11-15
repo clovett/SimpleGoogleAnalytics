@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Test": {
-      "commandName": "Project",
-      "commandLineArgs": "G-JS8YSYVDQX  eOkUmW73T9Wv5TUynCLAEA  https://microsoft.github.io/Coyote/Test"
-    }
-  }
-}
